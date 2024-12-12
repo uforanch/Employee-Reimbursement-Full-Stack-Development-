@@ -13,9 +13,17 @@ public class ExceptionAndErrorController {
     public @ResponseBody String duplicateUsername(DuplicateUsernameException ex){
         return ex.getMessage();
 
-    }@ExceptionHandler(InvalidAccountException.class)
+    }
+
+    @ExceptionHandler(InvalidAccountException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody String invalidAccount(InvalidAccountException ex){
+        return ex.getMessage();
+    }
+
+    @ExceptionHandler(UnauthorizedLogin.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public @ResponseBody String unauthorizedLogin(UnauthorizedLogin ex){
         return ex.getMessage();
     }
 

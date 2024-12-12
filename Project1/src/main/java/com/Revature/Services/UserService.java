@@ -42,4 +42,16 @@ public class UserService {
         return saved_user;
     }
 
+    public User login(User user){
+        User valid_user = userDAO.findUserByUsername(user.getusername());
+        if (valid_user == null){
+            throw new InvalidAccountException("No user exists for that username");
+        }
+        if (!user.getPassword().equals(valid_user.getPassword())){
+
+            throw new InvalidAccountException("Incorrect Password");
+        }
+        return valid_user;
+    }
+
 }
