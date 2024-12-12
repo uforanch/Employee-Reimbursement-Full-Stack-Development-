@@ -24,19 +24,20 @@ public class UserService {
         if (userDAO.findUserByUsername(user.getusername()) != null){
             throw new DuplicateUsernameException("Account with username " + user.getusername() + " already exists!");
         }
-        if (user.getusername().length() <=8){
+        if (user.getusername().length() <8){
             throw new InvalidAccountException("Username must be at least 8 characters");
         }
         if (user.getPassword().isBlank()){
             throw new InvalidAccountException("Password cannot be blank");
         }
-        if (user.getPassword().length()<=8){
+        if (user.getPassword().length()<8){
             throw new InvalidAccountException("Password must be at least 8 characters");
         }
 
         return true;
     }
     public User register(User user){
+        validateUser(user);
         User saved_user = userDAO.save(user);
         return saved_user;
     }

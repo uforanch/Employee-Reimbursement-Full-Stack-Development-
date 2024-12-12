@@ -16,7 +16,7 @@ public class Project1Application {
 
 		SpringApplication.run
 				(Project1Application.class, args);
-		System.out.println("User and Reimburement Management System Up and Running");
+		System.out.println("User and Reimbursement Management System Up and Running");
 	}
 
 }
