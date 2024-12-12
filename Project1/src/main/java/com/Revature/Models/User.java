@@ -14,7 +14,7 @@ public class User {
     private int userId;
 
     @Column(nullable = false)
-    private String name;
+    private String username;
 
     @Column(nullable = false)
     private String password;
@@ -32,9 +32,9 @@ public class User {
     public User() {
     }
 
-    public User(int userId, String name, String role) {
+    public User(int userId, String username, String role) {
         this.userId = userId;
-        this.name = name;
+        this.username = username;
         this.role = role;
     }
 
@@ -46,12 +46,12 @@ public class User {
         this.userId = userId;
     }
 
-    public String getName() {
-        return name;
+    public String getusername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setusername(String username) {
+        this.username = username;
     }
 
     public String getRole() {
@@ -74,7 +74,7 @@ public class User {
     public String toString() {
         return "User{" +
                 "userId=" + userId +
-                ", name='" + name + '\'' +
+                ", username='" + username + '\'' +
                 ", role='" + role + '\'' +
                 '}';
     }
