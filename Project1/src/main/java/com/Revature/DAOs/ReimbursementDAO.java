@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface ReimbursementDAO extends JpaRepository<Reimbursement,Integer> {
-    //List<User> FindByUser(User user);
+    List<Reimbursement> findByUserUserId(int userId);
 }

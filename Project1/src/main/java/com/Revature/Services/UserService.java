@@ -3,6 +3,7 @@ package com.Revature.Services;
 import com.Revature.DAOs.UserDAO;
 import com.Revature.Exception.DuplicateUsernameException;
 import com.Revature.Exception.InvalidAccountException;
+import com.Revature.Exception.UnauthorizedLogin;
 import com.Revature.Models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,17 @@ public class UserService {
         if (!user.getPassword().equals(valid_user.getPassword())){
 
             throw new InvalidAccountException("Incorrect Password");
+        }
+        return valid_user;
+    }
+
+    public User validate_session(int userId){
+        /*
+        Session validation logic goes here
+         */
+        User valid_user = userDAO.getById(userId);
+        if (valid_user == null){
+            throw new UnauthorizedLogin("Unauthorized Session");
         }
         return valid_user;
     }
