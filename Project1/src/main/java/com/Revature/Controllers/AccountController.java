@@ -45,6 +45,9 @@ public class AccountController {
         return ResponseEntity.ok(saved_reimbursement);
     }
 
+    //@PatchMapping("{userId}/reimbursements/{reimbursementId}")
+    //public ResponseEntity<String>
+
     @GetMapping("{userId}/reimbursements")
     public ResponseEntity<List<Reimbursement>> viewReimbursments(@PathVariable int userId){
         userService.validate_session(userId);
@@ -52,7 +55,24 @@ public class AccountController {
         return ResponseEntity.ok().body(reimbursementService.getReimbursements(userId));
     }
 
-    
+
+    @GetMapping("{userId}/reimbursements/pending")
+    public ResponseEntity<List<Reimbursement>> viewReimbursmentsPending(@PathVariable int userId){
+        User valid_user = userService.validate_session(userId);
+
+        return ResponseEntity.ok().body(reimbursementService.getReimbursmentsByStatus(valid_user, "Pending"));
+    }
+
+    @PatchMapping("{userId}/reimbursements/")
+    public  ResponseEntity<Reimbursement> updateReimbursement(@PathVariable int userId, @RequestBody Reimbursement reimbursement){
+        User valid_user = userService.validate_session(userId);
+        Reimbursement valid_r = reimbursementService.validateReimbursement(valid_user, reimbursement.getReimbursementId());
+
+        return ResponseEntity.ok().body(null);
+    }
+
+
+
 
 
 }

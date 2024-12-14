@@ -3,6 +3,7 @@ package com.Revature.Services;
 import com.Revature.DAOs.ReimbursementDAO;
 import com.Revature.DAOs.UserDAO;
 import com.Revature.Models.Reimbursement;
+import com.Revature.Models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -26,5 +27,20 @@ public class ReimbursementService {
 
     public List<Reimbursement> getReimbursements(int userId){
         return reimbursementDAO.findByUserUserId(userId);
+    }
+
+    public List<Reimbursement> getReimbursmentsByStatus(User user, String status){
+        return reimbursementDAO.findByUserAndStatus(user, status);
+    }
+
+    public Reimbursement validateReimbursement(User user, int reimbursementId){
+        Reimbursement valid_r = reimbursementDAO.getReferenceById(reimbursementId);
+        if (valid_r == null) {throw new IllegalArgumentException("No such reimbursement exists");}
+        if (valid_r.getUser().getUserId() != user.getUserId()){ throw new IllegalArgumentException("Reimbursement does not belong to this user");}
+        return valid_r;
+    }
+
+    public Reimbursement updateReimbursement(Reimbursement reimbursement){
+        return reimbursementDAO.save(reimbursement);
     }
 }
