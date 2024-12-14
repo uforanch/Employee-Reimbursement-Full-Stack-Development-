@@ -5,6 +5,7 @@ import com.Revature.Models.User;
 import com.Revature.Services.ReimbursementService;
 import com.Revature.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,15 +24,15 @@ public class AccountController {
     }
 
     @PostMapping("register")
-    public ResponseEntity<User> register(@RequestBody User user){
+    public ResponseEntity<Void> register(@RequestBody User user){
         User saved_user = userService.register(user);
-        return ResponseEntity.ok(saved_user);
+        return ResponseEntity.noContent().header("username", saved_user.getusername()).build();
     }
 
     @PostMapping("login")
-    public ResponseEntity<User> login(@RequestBody User user){
+    public ResponseEntity<String> login(@RequestBody User user){
         User valid_user = userService.login(user);
-        return ResponseEntity.ok(valid_user);
+        return ResponseEntity.status(HttpStatus.CREATED).body("succesfully registered");
     }
 
     @PostMapping("{userId}/reimbursements")
@@ -52,7 +53,7 @@ public class AccountController {
     public ResponseEntity<List<Reimbursement>> viewReimbursments(@PathVariable int userId){
         userService.validate_session(userId);
 
-        return ResponseEntity.ok().body(reimbursementService.getReimbursements(userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(reimbursementService.getReimbursements(userId));
     }
 
 

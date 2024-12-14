@@ -27,6 +27,12 @@ public class ExceptionAndErrorController {
         return ex.getMessage();
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public @ResponseBody String illegalArgument(IllegalArgumentException ex){
+        return ex.getMessage();
+    }
+
 
 
 
