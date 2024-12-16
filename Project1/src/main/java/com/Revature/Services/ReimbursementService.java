@@ -36,11 +36,15 @@ public class ReimbursementService {
     public Reimbursement validateReimbursement(User user, int reimbursementId){
         Reimbursement valid_r = reimbursementDAO.getReferenceById(reimbursementId);
         if (valid_r == null) {throw new IllegalArgumentException("No such reimbursement exists");}
-        if (valid_r.getUser().getUserId() != user.getUserId()){ throw new IllegalArgumentException("Reimbursement does not belong to this user");}
+        if (!((valid_r.getUser().getUserId() == user.getUserId())||(user.getRole().equals("Admin")))){ throw new IllegalArgumentException("Reimbursement does not belong to this user");}
         return valid_r;
     }
 
     public Reimbursement updateReimbursement(Reimbursement reimbursement){
         return reimbursementDAO.save(reimbursement);
+    }
+
+    public void deleteReimbursement(Reimbursement reimbursement){
+        reimbursementDAO.delete(reimbursement);
     }
 }

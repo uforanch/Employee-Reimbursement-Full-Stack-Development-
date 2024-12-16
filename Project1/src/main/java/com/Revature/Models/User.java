@@ -1,5 +1,6 @@
 package com.Revature.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ public class User {
     private String username;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @Column(nullable = false)
@@ -28,6 +30,7 @@ public class User {
     @OneToMany(mappedBy = "user",
             fetch = FetchType.EAGER,
             cascade = CascadeType.ALL)//
+    @JsonIgnore
     private List<Reimbursement> reimbursementList;
 
 

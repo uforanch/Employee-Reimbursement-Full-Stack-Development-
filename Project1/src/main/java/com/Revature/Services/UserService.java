@@ -17,7 +17,7 @@ public class UserService {
         this.userDAO = userDAO;
     }
 
-    private boolean validateUser(User user){
+    private boolean validateNewUser(User user){
         if (user.getusername().isBlank()) {
             throw new InvalidAccountException("Username cannot be blank");
 
@@ -38,7 +38,7 @@ public class UserService {
         return true;
     }
     public User register(User user){
-        validateUser(user);
+        validateNewUser(user);
         User saved_user = userDAO.save(user);
         return saved_user;
     }
@@ -53,6 +53,10 @@ public class UserService {
             throw new InvalidAccountException("Incorrect Password");
         }
         return valid_user;
+    }
+
+    public void delete_user(User user){
+        userDAO.delete(user);
     }
 
     public User validate_session(int userId){
