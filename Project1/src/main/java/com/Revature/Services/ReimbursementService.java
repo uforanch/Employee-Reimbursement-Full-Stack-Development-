@@ -2,12 +2,15 @@ package com.Revature.Services;
 
 import com.Revature.DAOs.ReimbursementDAO;
 import com.Revature.DAOs.UserDAO;
+import com.Revature.Exception.UnauthorizedLogin;
+import com.Revature.Models.DTOs.OutgoingReimbursement;
 import com.Revature.Models.Reimbursement;
 import com.Revature.Models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class ReimbursementService {
@@ -20,7 +23,16 @@ public class ReimbursementService {
         this.reimbursementDAO = reimbursementDAO;
     }
 
+    public void fillInUser(Reimbursement reimbursement){
+        Optional<User> optional_valid_user = userDAO.findById(reimbursement.getUser().getUserId());
+        if (optional_valid_user.isEmpty()){
+            throw new UnauthorizedLogin("User does not exist");
+        }
+        reimbursement.setUser(optional_valid_user.get());
+    }
+
     public Reimbursement createReimbursement(Reimbursement reimbursement){
+        fillInUser(reimbursement);
         Reimbursement saved_reimbursment = reimbursementDAO.save(reimbursement);
         return saved_reimbursment;
     }

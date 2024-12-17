@@ -1,5 +1,7 @@
 package com.Revature.Controllers;
 
+import com.Revature.Models.DTOs.OutgoingReimbursement;
+import com.Revature.Models.DTOs.OutgoingUser;
 import com.Revature.Models.Reimbursement;
 import com.Revature.Models.User;
 import com.Revature.Services.ReimbursementService;
@@ -14,27 +16,29 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @CrossOrigin(origins = "http://localhost:5173")
-public class AccountController {
+public class UserController {
     private final UserService userService;
     private final ReimbursementService reimbursementService;
 
     @Autowired
-    public AccountController(UserService userService, ReimbursementService reimbursementService) {
+    public UserController(UserService userService, ReimbursementService reimbursementService) {
         this.userService = userService;
         this.reimbursementService = reimbursementService;
     }
 
     /*
-    @GetMapping
-    public Reimbursement<Reimbursement> x(@RequestBody User user, @RequestBody Reimbursement r){
-        return ResponseEntity.ok(null)
-    }
-    */
+    validate if manager
 
+     */
+
+    @GetMapping()
+    public ResponseEntity<List<OutgoingUser>> getAllUsers(@RequestBody User user){
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
 
     @PostMapping("login")
-    public ResponseEntity<User> login(@RequestBody User user){
-        User valid_user = userService.login(user);
+    public ResponseEntity<OutgoingUser> login(@RequestBody User user){
+        OutgoingUser valid_user = userService.login(user);
 
         //return ResponseEntity.noContent().header("username", valid_user.getusername()).build();
         //need user id for future calls
@@ -43,8 +47,8 @@ public class AccountController {
 
 
     @PostMapping("register")
-    public ResponseEntity<User> register(@RequestBody User user){
-        User saved_user = userService.register(user);
+    public ResponseEntity<OutgoingUser> register(@RequestBody User user){
+        OutgoingUser saved_user = userService.register(user);
 
         //return ResponseEntity.status(HttpStatus.CREATED).body("succesfully registered");
         //need user id for future calls
@@ -52,19 +56,17 @@ public class AccountController {
     }
 
 
-    @PostMapping("{userId}/reimbursements")
-    public ResponseEntity<Reimbursement> createReimbursement(@PathVariable int userId, @RequestBody Reimbursement reimbursment){
-        User valid_user=userService.validate_session(userId);
 
-        reimbursment.setUser(valid_user);
+    @PatchMapping("{userId}/delete")
+    public  ResponseEntity<String>  deleteUser(@PathVariable int userId){
+        OutgoingUser valid_user = userService.validate_session(userId);
+        userService.delete_user(valid_user);
 
-
-        Reimbursement saved_reimbursement = reimbursementService.createReimbursement(reimbursment);
-        return ResponseEntity.ok(saved_reimbursement);
+        return ResponseEntity.accepted().body("successfully deleted");
     }
 
-    //@PatchMapping("{userId}/reimbursements/{reimbursementId}")
-    //public ResponseEntity<String>
+
+
 
     @GetMapping("/{userId}/reimbursements")
     public ResponseEntity<List<Reimbursement>> viewReimbursments(@PathVariable int userId){
@@ -77,26 +79,11 @@ public class AccountController {
 
     @GetMapping("/{userId}/reimbursements/pending")
     public ResponseEntity<List<Reimbursement>> viewReimbursmentsPending(@PathVariable int userId){
-        User valid_user = userService.validate_session(userId);
+        OutgoingUser valid_user = userService.validate_session(userId);
 
         return ResponseEntity.ok().body(reimbursementService.getReimbursmentsByStatus(valid_user, "Pending"));
     }
 
-    @PatchMapping("{userId}/reimbursements/")
-    public  ResponseEntity<Reimbursement> updateReimbursement(@PathVariable int userId, @RequestBody Reimbursement reimbursement){
-        User valid_user = userService.validate_session(userId);
-        Reimbursement valid_r = reimbursementService.validateReimbursement(valid_user, reimbursement.getReimbursementId());
-
-        return ResponseEntity.ok().body(null);
-    }
-
-    @PatchMapping("{userId}/delete")
-    public  ResponseEntity<String>  deleteUser(@PathVariable int userId){
-        User valid_user = userService.validate_session(userId);
-        userService.delete_user(valid_user);
-
-        return ResponseEntity.accepted().body("successfully deleted");
-    }
 
     @PatchMapping("{userId}/reimbursements/delete")
     public  ResponseEntity<String>  deleteReimbursement(@PathVariable int userId, Reimbursement reimbursement){

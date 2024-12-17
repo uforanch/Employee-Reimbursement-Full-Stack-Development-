@@ -4,9 +4,15 @@ import com.Revature.DAOs.UserDAO;
 import com.Revature.Exception.DuplicateUsernameException;
 import com.Revature.Exception.InvalidAccountException;
 import com.Revature.Exception.UnauthorizedLogin;
+import com.Revature.Models.DTOs.OutgoingUser;
 import com.Revature.Models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class UserService {
@@ -18,14 +24,14 @@ public class UserService {
     }
 
     private boolean validateNewUser(User user){
-        if (user.getusername().isBlank()) {
+        if (user.getUsername().isBlank()) {
             throw new InvalidAccountException("Username cannot be blank");
 
         }
-        if (userDAO.findUserByUsername(user.getusername()) != null){
-            throw new DuplicateUsernameException("Account with username " + user.getusername() + " already exists!");
+        if (userDAO.findUserByUsername(user.getUsername()) != null){
+            throw new DuplicateUsernameException("Account with username " + user.getUsername() + " already exists!");
         }
-        if (user.getusername().length() <8){
+        if (user.getUsername().length() <8){
             throw new InvalidAccountException("Username must be at least 8 characters");
         }
         if (user.getPassword().isBlank()){
@@ -37,14 +43,14 @@ public class UserService {
 
         return true;
     }
-    public User register(User user){
+    public OutgoingUser register(User user){
         validateNewUser(user);
         User saved_user = userDAO.save(user);
-        return saved_user;
+        return new OutgoingUser(saved_user);
     }
 
-    public User login(User user){
-        User valid_user = userDAO.findUserByUsername(user.getusername());
+    public OutgoingUser login(User user){
+        User valid_user = userDAO.findUserByUsername(user.getUsername());
         if (valid_user == null){
             throw new InvalidAccountException("No user exists for that username");
         }
@@ -55,14 +61,27 @@ public class UserService {
 
             throw new InvalidAccountException("Incorrect Password");
         }
-        return valid_user;
+        return new OutgoingUser(valid_user);
     }
 
     public void delete_user(User user){
         userDAO.delete(user);
     }
 
-    public User validate_session(int userId){
+
+
+    public List<OutgoingUser> getAllUsers() {
+        List<User> listUser = userDAO.findAll();
+        List<OutgoingUser> listOut = new ArrayList<>();
+        for(User user:listUser){
+            listOut.add(new OutgoingUser(user));
+        }
+        return listOut;
+
+
+    }
+
+    public OutgoingUser validate_session(int userId){
         /*
         Session validation logic goes here
          */
@@ -70,7 +89,7 @@ public class UserService {
         if (valid_user == null){
             throw new UnauthorizedLogin("Unauthorized Session");
         }
-        return valid_user;
+        return new OutgoingUser(valid_user);
     }
 
 }
