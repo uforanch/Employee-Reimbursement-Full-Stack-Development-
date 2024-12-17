@@ -6,7 +6,10 @@ function UserPage() {
     const user = useContext(AuthContext)
     if (user.userId==0){
         return <>No User</>
-    }
+    } else if (user.role==="Manager"){
+
+
+    } else {
 
     return <>
     <div>
@@ -19,6 +22,7 @@ function UserPage() {
         <Route>  </Route>
     </Routes>
     </BrowserRouter></>
+    }
 
 }
 
