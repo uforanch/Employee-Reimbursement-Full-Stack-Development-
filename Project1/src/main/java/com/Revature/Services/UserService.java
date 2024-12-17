@@ -48,6 +48,9 @@ public class UserService {
         if (valid_user == null){
             throw new InvalidAccountException("No user exists for that username");
         }
+        if (user.getPassword()== null){
+            throw new InvalidAccountException("Incorrect Password");
+        }
         if (!user.getPassword().equals(valid_user.getPassword())){
 
             throw new InvalidAccountException("Incorrect Password");

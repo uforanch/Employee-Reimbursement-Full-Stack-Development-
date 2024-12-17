@@ -7,7 +7,7 @@ function About():ReactNode {
     const toRegister = ()=>{nav("register")}
 
     return <>
-    <h3>Welcome to Rimbsr</h3>
+    <h3 className="Welcome">Welcome to Rimbsr</h3>
     <h5 className="Quote">Your reimbursment paradise</h5>
     <button onClick={toLogin}>Login</button><button onClick={toRegister}>Register</button>
 

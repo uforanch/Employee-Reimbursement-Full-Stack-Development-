@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @EntityScan("com.Revature.Models")
 @ComponentScan("com.Revature")
 @EnableJpaRepositories("com.Revature.DAOs")
-@CrossOrigin(origins="http://localhost:9000")
 public class Project1Application {
 
 	public static void main(String[] args) {
