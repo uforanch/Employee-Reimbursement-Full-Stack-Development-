@@ -1,5 +1,6 @@
-import { ReactNode, useState } from "react"
+import { ReactNode, useContext, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import AuthorizationProps, { AuthContext } from "./Common/Authorization";
 
 interface DisabledAdvice{
     disabled: boolean;
@@ -11,7 +12,11 @@ function Register():ReactNode{
     const [getPassword1, setPassword1] = useState<string>("")
     const [getPassword2, setPassword2] = useState<string>("")
     const nav = useNavigate()
+    
+    
+    
     const btnDisable = ():DisabledAdvice =>{
+    
         let etext:string = "";
         if(getUsername.length == 0){
             etext="Cannot have blank username"
@@ -49,4 +54,4 @@ function Register():ReactNode{
     </>
 }
 
-export default Register
+export default Register;

@@ -2,8 +2,9 @@ import axios, { AxiosError } from "axios";
 import { ReactNode, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import configData from "../config/config.json"
-
-function Login():ReactNode{
+import AuthorizationProps from "./Common/Authorization";
+import AuthSetterType from "./Common/AuthSetterType";
+function Login({authSetter}:AuthSetterType):ReactNode{
 
 
     const nav=useNavigate()
@@ -25,7 +26,15 @@ function Login():ReactNode{
             .then(
                 response=>{
                     setErrorText("");
-                    console.log(response)})
+                    console.log(response)
+                    const authProp:AuthorizationProps = {username:response.data.username,
+                        userId:response.data.userId,
+                        role:response.data.role
+                    }
+                    authSetter(authProp)
+                    nav("/user")
+                }
+                )
             .catch((error:AxiosError)=>{
                 console.log("error"); 
                 console.log(error); 
@@ -35,13 +44,13 @@ function Login():ReactNode{
                     if (typeof error.response.data =='string'){
                         setErrorText(error.response.data)
                     } else {
-                        setErrorText("")
+                        setErrorText(errorText)
                     }
                 } else {
-                    setErrorText("")
+                    setErrorText(errorText)
                 }
         })}
-  axiosSubmit00()
+        axiosSubmit00()
     }
     return <>
     <div>

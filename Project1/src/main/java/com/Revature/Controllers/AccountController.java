@@ -24,6 +24,14 @@ public class AccountController {
         this.reimbursementService = reimbursementService;
     }
 
+    /*
+    @GetMapping
+    public Reimbursement<Reimbursement> x(@RequestBody User user, @RequestBody Reimbursement r){
+        return ResponseEntity.ok(null)
+    }
+    */
+
+
     @PostMapping("login")
     public ResponseEntity<User> login(@RequestBody User user){
         User valid_user = userService.login(user);
@@ -58,15 +66,16 @@ public class AccountController {
     //@PatchMapping("{userId}/reimbursements/{reimbursementId}")
     //public ResponseEntity<String>
 
-    @GetMapping("{userId}/reimbursements")
+    @GetMapping("/{userId}/reimbursements")
     public ResponseEntity<List<Reimbursement>> viewReimbursments(@PathVariable int userId){
+        System.out.println("reached this endpoint");
         userService.validate_session(userId);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(reimbursementService.getReimbursements(userId));
+        return ResponseEntity.ok().body(reimbursementService.getReimbursements(userId));
     }
 
 
-    @GetMapping("{userId}/reimbursements/pending")
+    @GetMapping("/{userId}/reimbursements/pending")
     public ResponseEntity<List<Reimbursement>> viewReimbursmentsPending(@PathVariable int userId){
         User valid_user = userService.validate_session(userId);
 
@@ -98,6 +107,8 @@ public class AccountController {
 
         return ResponseEntity.accepted().body("successfully deleted");
     }
+
+
 
 
 
