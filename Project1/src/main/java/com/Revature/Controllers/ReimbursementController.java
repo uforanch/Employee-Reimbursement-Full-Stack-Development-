@@ -1,8 +1,8 @@
 package com.Revature.Controllers;
 
 
+import com.Revature.Aspects.ManagerOnly;
 import com.Revature.Models.DTOs.OutgoingReimbursement;
-import com.Revature.Models.DTOs.OutgoingUser;
 import com.Revature.Models.Reimbursement;
 import com.Revature.Models.User;
 import com.Revature.Services.ReimbursementService;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reimbursements")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class ReimbursementController {
     private final UserService userService;
     private final ReimbursementService reimbursementService;
@@ -28,14 +28,35 @@ public class ReimbursementController {
     /*
     validate if manager
      */
+
+
+
+    @ManagerOnly
     @GetMapping()
     public ResponseEntity<List<OutgoingReimbursement>> getAllReimbursements(){
-        return ResponseEntity.ok(null);
+
+        return ResponseEntity.ok(reimbursementService.getAllReimbursements());
     }
+
+    @GetMapping("/{r_id}")
+    public ResponseEntity<OutgoingReimbursement> getReimbursement(@PathVariable int r_id){
+
+        return ResponseEntity.ok(reimbursementService.getReimbursment(r_id));
+    }
+
+
+    @ManagerOnly
+    @GetMapping("/pending")
+    public ResponseEntity<List<OutgoingReimbursement>> getAllReimbursementsByStatus(){
+        return ResponseEntity.ok(reimbursementService.getReimbursementsByStatus("Pending"));
+    }
+
+
+
     @PostMapping()
-    public ResponseEntity<Reimbursement> createReimbursement(@RequestBody Reimbursement reimbursment){
-        Reimbursement saved_reimbursement = reimbursementService.createReimbursement(reimbursment);
-        return ResponseEntity.ok(saved_reimbursement);
+    public ResponseEntity<OutgoingReimbursement> createReimbursement(@RequestBody OutgoingReimbursement reimbursment){
+
+        return ResponseEntity.ok(reimbursementService.createReimbursement(reimbursment));
     }
 
     /*
@@ -43,22 +64,23 @@ public class ReimbursementController {
      validate if same user or manager
      */
     @PatchMapping()
-    public  ResponseEntity<OutgoingReimbursement> updateReimbursement(@RequestBody Reimbursement reimbursement){
-        updateReimbursement(reimbursement);
-        return ResponseEntity.ok().body(new OutgoingReimbursement(reimbursement));
+    public  ResponseEntity<OutgoingReimbursement> updateReimbursement(@RequestBody OutgoingReimbursement reimbursement){
+        System.out.println(reimbursement);
+
+        return ResponseEntity.ok().body(reimbursementService.updateReimbursement(reimbursement));
     }
 
-    /*
-        validate if manager
-     */
 
-    @PatchMapping("delete")
-    public  ResponseEntity<String>  deleteReimbursement(@PathVariable int userId, Reimbursement reimbursement){
-        User valid_user = userService.validate_session(userId);
-        Reimbursement valid_r = reimbursementService.validateReimbursement(valid_user, reimbursement.getReimbursementId());
+    @ManagerOnly
+    @PatchMapping("/{reimbursementId}/delete")
+    public  ResponseEntity<String>  deleteReimbursement(@PathVariable int reimbursementId){
 
-        reimbursementService.deleteReimbursement(valid_r);
+        reimbursementService.deleteReimbursementById(reimbursementId);
 
         return ResponseEntity.accepted().body("successfully deleted");
     }
+
+
+
+
 }

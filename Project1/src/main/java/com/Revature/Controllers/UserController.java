@@ -1,5 +1,7 @@
 package com.Revature.Controllers;
 
+import com.Revature.Aspects.AuthAspect;
+import com.Revature.Aspects.ManagerOnly;
 import com.Revature.Models.DTOs.OutgoingReimbursement;
 import com.Revature.Models.DTOs.OutgoingUser;
 import com.Revature.Models.Reimbursement;
@@ -7,7 +9,6 @@ import com.Revature.Models.User;
 import com.Revature.Services.ReimbursementService;
 import com.Revature.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class UserController {
     private final UserService userService;
     private final ReimbursementService reimbursementService;
@@ -26,73 +27,60 @@ public class UserController {
         this.reimbursementService = reimbursementService;
     }
 
-    /*
-    validate if manager
-
-     */
-
+    @ManagerOnly
     @GetMapping()
-    public ResponseEntity<List<OutgoingUser>> getAllUsers(@RequestBody User user){
+    public ResponseEntity<List<OutgoingUser>> getAllUsers(){
+
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @PostMapping("login")
-    public ResponseEntity<OutgoingUser> login(@RequestBody User user){
-        OutgoingUser valid_user = userService.login(user);
-
-        //return ResponseEntity.noContent().header("username", valid_user.getusername()).build();
-        //need user id for future calls
-        return ResponseEntity.ok(valid_user);
-    }
-
-
-    @PostMapping("register")
-    public ResponseEntity<OutgoingUser> register(@RequestBody User user){
-        OutgoingUser saved_user = userService.register(user);
-
-        //return ResponseEntity.status(HttpStatus.CREATED).body("succesfully registered");
-        //need user id for future calls
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved_user);
-    }
 
 
 
+    @ManagerOnly
     @PatchMapping("{userId}/delete")
     public  ResponseEntity<String>  deleteUser(@PathVariable int userId){
-        OutgoingUser valid_user = userService.validate_session(userId);
-        userService.delete_user(valid_user);
-
+        OutgoingUser valid_user = userService.retrieveUser(userId);
+        userService.deleteUser(valid_user);
         return ResponseEntity.accepted().body("successfully deleted");
     }
 
+    @PatchMapping()
+    public  ResponseEntity<OutgoingUser>   updateUser(@RequestBody User update){
+        System.out.println(update);
 
 
+        return ResponseEntity.accepted().body(userService.updateUser(update));
+    }
+
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<User> getUserProfile(@PathVariable int userId){
+        return ResponseEntity.ok( userService.getUserProfile(userId));
+    }
 
     @GetMapping("/{userId}/reimbursements")
-    public ResponseEntity<List<Reimbursement>> viewReimbursments(@PathVariable int userId){
-        System.out.println("reached this endpoint");
-        userService.validate_session(userId);
+    public ResponseEntity<List<OutgoingReimbursement>> viewReimbursmentsForUser(@PathVariable int userId){
+        int sessionUserId = AuthAspect.getSessionUserId();
+        String sessionUserRole = AuthAspect.getSessionUserRole();
+        if ((sessionUserId != userId) && (!sessionUserRole.equals("Manager"))){
+            throw new IllegalArgumentException("Unauthorized access to other user reimbursments.");
+        }
 
-        return ResponseEntity.ok().body(reimbursementService.getReimbursements(userId));
+        return ResponseEntity.ok().body(reimbursementService.getReimbursementsByUserId(userId));
     }
-
 
     @GetMapping("/{userId}/reimbursements/pending")
-    public ResponseEntity<List<Reimbursement>> viewReimbursmentsPending(@PathVariable int userId){
-        OutgoingUser valid_user = userService.validate_session(userId);
+    public ResponseEntity<List<OutgoingReimbursement>> viewReimbursmentsPending(@PathVariable int userId){
+        int sessionUserId = AuthAspect.getSessionUserId();
+        String sessionUserRole = AuthAspect.getSessionUserRole();
+        if ((sessionUserId != userId) && (!sessionUserRole.equals("Manager"))){
+            throw new IllegalArgumentException("Unauthorized access to other user reimbursments.");
+        }
 
-        return ResponseEntity.ok().body(reimbursementService.getReimbursmentsByStatus(valid_user, "Pending"));
-    }
+        OutgoingUser valid_user = userService.retrieveUser(userId);
 
-
-    @PatchMapping("{userId}/reimbursements/delete")
-    public  ResponseEntity<String>  deleteReimbursement(@PathVariable int userId, Reimbursement reimbursement){
-        User valid_user = userService.validate_session(userId);
-        Reimbursement valid_r = reimbursementService.validateReimbursement(valid_user, reimbursement.getReimbursementId());
-
-        reimbursementService.deleteReimbursement(valid_r);
-
-        return ResponseEntity.accepted().body("successfully deleted");
+        return ResponseEntity.ok().body(reimbursementService.getReimburesmentsByStatus(valid_user, "Pending"));
     }
 
 

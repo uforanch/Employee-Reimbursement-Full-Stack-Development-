@@ -1,5 +1,6 @@
 package com.Revature.Services;
 
+import com.Revature.Aspects.AuthAspect;
 import com.Revature.DAOs.UserDAO;
 import com.Revature.Exception.DuplicateUsernameException;
 import com.Revature.Exception.InvalidAccountException;
@@ -11,8 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.util.stream.Collectors.toList;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -64,8 +64,13 @@ public class UserService {
         return new OutgoingUser(valid_user);
     }
 
-    public void delete_user(User user){
-        userDAO.delete(user);
+    public void deleteUser(OutgoingUser user){
+        Optional<User> valid_user = userDAO.findById(user.getUserId());
+        if (valid_user.isEmpty()){
+            // error should happen before this but keeping this here
+            throw new InvalidAccountException("No such account");
+        }
+        userDAO.delete(valid_user.get());
     }
 
 
@@ -81,7 +86,7 @@ public class UserService {
 
     }
 
-    public OutgoingUser validate_session(int userId){
+    public OutgoingUser retrieveUser(int userId){
         /*
         Session validation logic goes here
          */
@@ -90,6 +95,51 @@ public class UserService {
             throw new UnauthorizedLogin("Unauthorized Session");
         }
         return new OutgoingUser(valid_user);
+    }
+
+    public User getUserProfile(int userId){
+        Optional<User> optionalUser = userDAO.findById(userId);
+        if (optionalUser.isEmpty()){
+            throw new InvalidAccountException("No such user");
+        }
+        User user = optionalUser.get();
+        System.out.println(AuthAspect.getSessionUsername());
+        if ((user.getUserId() != AuthAspect.getSessionUserId()) && (!"Manager".equals(AuthAspect.getSessionUserRole()))){
+            throw new InvalidAccountException("Unauthorized profile view");
+        }
+        return user;
+    }
+
+    public OutgoingUser updateUser(User user){
+        //probably would have done other functions like this if I knew before
+
+        System.out.println("------------------------------");
+        System.out.println(AuthAspect.getSessionUserId());
+        System.out.println(AuthAspect.getSessionUserRole());
+        System.out.println(AuthAspect.getSessionUsername());
+        System.out.println(user.getUserId());
+
+
+
+        if ((AuthAspect.getSessionUserId()!=user.getUserId()) && (!"Manager".equals(AuthAspect.getSessionUserRole()))){
+            throw new InvalidAccountException("Cannot update others account");
+        }
+        Optional<User> oldUserOptional = userDAO.findById(user.getUserId());
+        if (oldUserOptional.isEmpty()){
+            throw new IllegalArgumentException("No such account");
+        }
+
+        User oldUser = oldUserOptional.get();
+        if ((!oldUser.getRole().equals(user.getRole())) &&  (!"Manager".equals(AuthAspect.getSessionUserRole()))){
+            throw new InvalidAccountException("Only mangers can change a users role");
+        }
+
+        /*
+        TODO: check if passwords match or blank or whatever
+
+         */
+
+        return new OutgoingUser(userDAO.save(user));
     }
 
 }

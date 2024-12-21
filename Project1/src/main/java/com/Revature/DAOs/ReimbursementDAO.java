@@ -15,6 +15,7 @@ public interface ReimbursementDAO extends JpaRepository<Reimbursement,Integer> {
 
     List<Reimbursement> findByUserAndStatus(User user, String status);
 
+    List<Reimbursement> findByStatus(String status);
 
     //@Query("SELECT r FROM Reimbursement r WHERE r.user=?1 AND r.status=?2")
     //List<Reimbursement> testQuery(User user, String status);
