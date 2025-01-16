@@ -79,7 +79,7 @@ function AdminNewReimbursementEdit() {
     return <>
     <div className="Edit">
         <p>date issued:</p> <p><input type="date" onChange={(event)=>{setDate(event.target.value)}}/></p><p> value: </p><p><input type="number" onChange={(event)=>{setValue(event.target.value)}}/></p>
-        <p> user: </p><p> <select value={id} onChange={(event)=>{setUsersFilter(Number.parseInt(event.target.value))}}>{getUsers.map((u)=><option value={u.userId}>{u.username}</option>)}</select> </p>
+        <p> user: </p><p> <select onChange={(event)=>{setUsersFilter(Number.parseInt(event.target.value))}}>{getUsers.map((u)=><option value={u.userId}>{u.username}</option>)}</select> </p>
         
         <p>status:</p><p> </p><p><select value={getStatus} onChange={(event)=>{setStatus(event.target.value)}}>
                 <option value="Pending">Pending</option>

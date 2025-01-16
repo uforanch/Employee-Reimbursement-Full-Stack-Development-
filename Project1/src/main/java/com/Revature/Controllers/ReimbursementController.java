@@ -29,18 +29,14 @@ public class ReimbursementController {
     validate if manager
      */
 
-
-
     @ManagerOnly
     @GetMapping()
     public ResponseEntity<List<OutgoingReimbursement>> getAllReimbursements(){
-
         return ResponseEntity.ok(reimbursementService.getAllReimbursements());
     }
 
     @GetMapping("/{r_id}")
     public ResponseEntity<OutgoingReimbursement> getReimbursement(@PathVariable int r_id){
-
         return ResponseEntity.ok(reimbursementService.getReimbursment(r_id));
     }
 
@@ -55,7 +51,6 @@ public class ReimbursementController {
 
     @PostMapping()
     public ResponseEntity<OutgoingReimbursement> createReimbursement(@RequestBody OutgoingReimbursement reimbursment){
-
         return ResponseEntity.ok(reimbursementService.createReimbursement(reimbursment));
     }
 
@@ -66,21 +61,13 @@ public class ReimbursementController {
     @PatchMapping()
     public  ResponseEntity<OutgoingReimbursement> updateReimbursement(@RequestBody OutgoingReimbursement reimbursement){
         System.out.println(reimbursement);
-
         return ResponseEntity.ok().body(reimbursementService.updateReimbursement(reimbursement));
     }
-
 
     @ManagerOnly
     @PatchMapping("/{reimbursementId}/delete")
     public  ResponseEntity<String>  deleteReimbursement(@PathVariable int reimbursementId){
-
         reimbursementService.deleteReimbursementById(reimbursementId);
-
         return ResponseEntity.accepted().body("successfully deleted");
     }
-
-
-
-
 }

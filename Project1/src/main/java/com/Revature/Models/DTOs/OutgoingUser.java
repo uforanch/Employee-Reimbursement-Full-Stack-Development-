@@ -2,8 +2,10 @@ package com.Revature.Models.DTOs;
 
 import com.Revature.Models.User;
 
+import java.util.UUID;
+
 public class OutgoingUser {
-    private int userId;
+    private UUID userId;
     private String username;
     private String role;
     private String firstname;
@@ -12,7 +14,7 @@ public class OutgoingUser {
     public OutgoingUser() {
     }
 
-    public OutgoingUser(int userId, String username, String role, String firstname, String lastname) {
+    public OutgoingUser(UUID userId, String username, String role, String firstname, String lastname) {
         this.userId = userId;
         this.username = username;
         this.role = role;
@@ -30,11 +32,11 @@ public class OutgoingUser {
         lastname = user.getLastName();
     }
 
-    public int getUserId() {
+    public UUID getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(UUID userId) {
         this.userId = userId;
     }
 

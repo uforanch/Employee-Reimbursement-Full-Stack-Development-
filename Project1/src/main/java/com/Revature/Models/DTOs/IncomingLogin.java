@@ -1,4 +1,5 @@
 package com.Revature.Models.DTOs;
 
-public class IncomingLogin {
-}
+
+public record IncomingLogin(String username, String password) {}
+

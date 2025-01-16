@@ -8,10 +8,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface ReimbursementDAO extends JpaRepository<Reimbursement,Integer> {
-    List<Reimbursement> findByUserUserId(int userId);
+    List<Reimbursement> findByUserUserId(UUID userId);
 
     List<Reimbursement> findByUserAndStatus(User user, String status);
 

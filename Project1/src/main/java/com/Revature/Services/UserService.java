@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -49,19 +50,27 @@ public class UserService {
         return new OutgoingUser(saved_user);
     }
 
-    public OutgoingUser login(User user){
-        User valid_user = userDAO.findUserByUsername(user.getUsername());
+    public OutgoingUser login(String username, String password){
+        User valid_user = userDAO.findUserByUsername(username);
         if (valid_user == null){
             throw new InvalidAccountException("No user exists for that username");
         }
-        if (user.getPassword()== null){
+        if (password== null){
             throw new InvalidAccountException("Incorrect Password");
         }
-        if (!user.getPassword().equals(valid_user.getPassword())){
+        if (password.equals(valid_user.getPassword())){
 
             throw new InvalidAccountException("Incorrect Password");
         }
         return new OutgoingUser(valid_user);
+    }
+
+    public User getUserByUsername(String username){
+        User valid_user = userDAO.findUserByUsername(username);
+        if (valid_user == null){
+            throw new InvalidAccountException("No user exists for that username");
+        }
+        return valid_user;
     }
 
     public void deleteUser(OutgoingUser user){
@@ -86,7 +95,7 @@ public class UserService {
 
     }
 
-    public OutgoingUser retrieveUser(int userId){
+    public OutgoingUser retrieveUser(UUID userId){
         /*
         Session validation logic goes here
          */
@@ -97,14 +106,16 @@ public class UserService {
         return new OutgoingUser(valid_user);
     }
 
-    public User getUserProfile(int userId){
+    public User getUserProfile(UUID userId){
         Optional<User> optionalUser = userDAO.findById(userId);
         if (optionalUser.isEmpty()){
             throw new InvalidAccountException("No such user");
         }
         User user = optionalUser.get();
         System.out.println(AuthAspect.getSessionUsername());
-        if ((user.getUserId() != AuthAspect.getSessionUserId()) && (!"Manager".equals(AuthAspect.getSessionUserRole()))){
+        User loggedUser = userDAO.findUserByUsername(AuthAspect.getSessionUsername());
+
+        if ((user.getUserId().equals(loggedUser.getUserId()) ) && (!AuthAspect.getSessionUserRoles().contains("Manager"))){
             throw new InvalidAccountException("Unauthorized profile view");
         }
         return user;
@@ -114,15 +125,16 @@ public class UserService {
         //probably would have done other functions like this if I knew before
 
         System.out.println("------------------------------");
-        System.out.println(AuthAspect.getSessionUserId());
-        System.out.println(AuthAspect.getSessionUserRole());
+
+        System.out.println(AuthAspect.getSessionUserRoles());
         System.out.println(AuthAspect.getSessionUsername());
         System.out.println(user.getUserId());
 
 
+        User loggedUser = userDAO.findUserByUsername(AuthAspect.getSessionUsername());
 
-        if ((AuthAspect.getSessionUserId()!=user.getUserId()) && (!"Manager".equals(AuthAspect.getSessionUserRole()))){
-            throw new InvalidAccountException("Cannot update others account");
+        if ((user.getUserId().equals(loggedUser.getUserId()) ) && (!AuthAspect.getSessionUserRoles().contains("Manager"))){
+            throw new InvalidAccountException("Unauthorized profile view");
         }
         Optional<User> oldUserOptional = userDAO.findById(user.getUserId());
         if (oldUserOptional.isEmpty()){
@@ -130,7 +142,7 @@ public class UserService {
         }
 
         User oldUser = oldUserOptional.get();
-        if ((!oldUser.getRole().equals(user.getRole())) &&  (!"Manager".equals(AuthAspect.getSessionUserRole()))){
+        if ((!oldUser.getRole().equals(user.getRole())) &&  (!AuthAspect.getSessionUserRoles().contains("Manager"))){
             throw new InvalidAccountException("Only mangers can change a users role");
         }
 

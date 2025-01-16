@@ -3,18 +3,22 @@ package com.Revature.Models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @Entity
 @Table(name="users")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class User {
+public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int userId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID userId;
 
     @Column(nullable = false)
     private String username;
@@ -41,7 +45,7 @@ public class User {
     public User() {
     }
 
-    public User(int userId, String username, String firstName, String lastName, String password, String role, List<Reimbursement> reimbursementList) {
+    public User(UUID userId, String username, String firstName, String lastName, String password, String role, List<Reimbursement> reimbursementList) {
         this.userId = userId;
         this.username = username;
         this.firstName = firstName;
@@ -51,11 +55,11 @@ public class User {
         this.reimbursementList = reimbursementList;
     }
 
-    public int getUserId() {
+    public UUID getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(UUID userId) {
         this.userId = userId;
     }
 
@@ -117,5 +121,32 @@ public class User {
                 ", password='" + password + '\'' +
                 ", role='" + role +
                 '}';
+    }
+
+
+    //~~~~~~~~~~~~~~~ UserDetails Overrides ~~~~~~~~~~~~~~~~
+    @Override
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return UserDetails.super.isAccountNonLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return UserDetails.super.isEnabled();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
     }
 }

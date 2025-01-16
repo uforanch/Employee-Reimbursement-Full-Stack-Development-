@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public class ReimbursementService {
@@ -33,7 +34,8 @@ public class ReimbursementService {
             throw new IllegalArgumentException("No such reimbursement");
         }
         Reimbursement valid_r = optional_valid_r.get();
-        if (valid_r.getUser().getUserId()!=AuthAspect.getSessionUserId() && !"Manager".equals(AuthAspect.getSessionUserRole())){
+        User loggedUser = userDAO.findUserByUsername(AuthAspect.getSessionUsername());
+        if (!valid_r.getUser().getUserId().equals(loggedUser.getUserId() ) && !AuthAspect.getSessionUserRoles().contains("Manager")){
             throw  new InvalidAccountException("Other user's reimbursmenet not viewable");
         }
         return new OutgoingReimbursement(valid_r);
@@ -54,10 +56,11 @@ public class ReimbursementService {
                 outgoingReimbursement.getDate_issued(),
                 optional_valid_user.get());
         //status is pending on creation
-        if (!"Pending".equals(reimbursement.getStatus())&&(!"Manager".equals(AuthAspect.getSessionUserRole()))){
+        if (!"Pending".equals(reimbursement.getStatus())&&(!AuthAspect.getSessionUserRoles().contains("Manager"))){
             throw new IllegalArgumentException("Unauthorized to create non pending reimbursment");
         }
-        if ((outgoingReimbursement.getUser().getUserId() != AuthAspect.getSessionUserId())&&(!"Manager".equals(AuthAspect.getSessionUserRole()))){
+        User loggedUser = userDAO.findUserByUsername(AuthAspect.getSessionUsername());
+        if ((!outgoingReimbursement.getUser().getUserId().equals(loggedUser.getUserId()))&&(!AuthAspect.getSessionUserRoles().contains("Manager"))){
             throw new IllegalArgumentException("Unauthorized to create reimbursment for others if not manager");
         }
         Reimbursement saved_reimbursment = reimbursementDAO.save(reimbursement);
@@ -72,7 +75,12 @@ public class ReimbursementService {
         return reimbursementDAO.findByStatus(status).stream().map((item)->{return new OutgoingReimbursement(item);}).toList();
     }
 
-    public List<OutgoingReimbursement> getReimbursementsByUserId(int userId){
+    public List<OutgoingReimbursement> getReimbursementsByUserId(UUID userId){
+        User loggedUser = userDAO.findUserByUsername(AuthAspect.getSessionUsername());
+        if (!loggedUser.getUserId().equals(userId)&& !AuthAspect.getSessionUserRoles().contains("Manager")){
+            throw new IllegalArgumentException("Unauthorized access to other user reimbursments.");
+        }
+
         return reimbursementDAO.findByUserUserId(userId).stream().map((item)->{return new OutgoingReimbursement(item);}).toList();
     }
 
@@ -100,7 +108,7 @@ public class ReimbursementService {
         System.out.println(oldReimbursement);
 
 
-        if (!"Manager".equals(AuthAspect.getSessionUserRole())){
+        if (!AuthAspect.getSessionUserRoles().contains("Manager")){
             if (!oldReimbursement.getStatus().equals(reimbursement.getStatus())){
                 throw new InvalidAccountException("Only managers can change status of reimbursement");
             }

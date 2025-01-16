@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -39,7 +40,7 @@ public class UserController {
 
     @ManagerOnly
     @PatchMapping("{userId}/delete")
-    public  ResponseEntity<String>  deleteUser(@PathVariable int userId){
+    public  ResponseEntity<String>  deleteUser(@PathVariable UUID userId){
         OutgoingUser valid_user = userService.retrieveUser(userId);
         userService.deleteUser(valid_user);
         return ResponseEntity.accepted().body("successfully deleted");
@@ -55,32 +56,23 @@ public class UserController {
 
 
     @GetMapping("/{userId}")
-    public ResponseEntity<User> getUserProfile(@PathVariable int userId){
+    public ResponseEntity<User> getUserProfile(@PathVariable UUID userId){
         return ResponseEntity.ok( userService.getUserProfile(userId));
     }
 
     @GetMapping("/{userId}/reimbursements")
-    public ResponseEntity<List<OutgoingReimbursement>> viewReimbursmentsForUser(@PathVariable int userId){
-        int sessionUserId = AuthAspect.getSessionUserId();
-        String sessionUserRole = AuthAspect.getSessionUserRole();
-        if ((sessionUserId != userId) && (!sessionUserRole.equals("Manager"))){
-            throw new IllegalArgumentException("Unauthorized access to other user reimbursments.");
-        }
-
+    public ResponseEntity<List<OutgoingReimbursement>> viewReimbursmentsForUser(@PathVariable UUID userId){
         return ResponseEntity.ok().body(reimbursementService.getReimbursementsByUserId(userId));
     }
 
     @GetMapping("/{userId}/reimbursements/pending")
-    public ResponseEntity<List<OutgoingReimbursement>> viewReimbursmentsPending(@PathVariable int userId){
-        int sessionUserId = AuthAspect.getSessionUserId();
-        String sessionUserRole = AuthAspect.getSessionUserRole();
-        if ((sessionUserId != userId) && (!sessionUserRole.equals("Manager"))){
+    public ResponseEntity<List<OutgoingReimbursement>> viewReimbursmentsPending(@PathVariable UUID userId){
+        User valid_user = userService.getUserByUsername(AuthAspect.getSessionUsername());
+        if (!valid_user.getUserId().equals(userId) && !AuthAspect.getSessionUserRoles().contains("Manager")){
             throw new IllegalArgumentException("Unauthorized access to other user reimbursments.");
         }
 
-        OutgoingUser valid_user = userService.retrieveUser(userId);
-
-        return ResponseEntity.ok().body(reimbursementService.getReimburesmentsByStatus(valid_user, "Pending"));
+        return ResponseEntity.ok().body(reimbursementService.getReimburesmentsByStatus(new OutgoingUser(valid_user), "Pending"));
     }
 
 
