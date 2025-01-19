@@ -1,6 +1,7 @@
 package com.Revature.Controllers;
 
 import com.Revature.Aspects.AuthAspect;
+import com.Revature.Exception.OtherException;
 import com.Revature.Models.DTOs.IncomingLogin;
 import com.Revature.Models.DTOs.OutgoingUser;
 import com.Revature.Models.DTOs.OutgoingUserAndTokenDTO;
@@ -35,30 +36,39 @@ public class AuthController {
     }
 
     private OutgoingUserAndTokenDTO login_function(String username, String password){
-        System.out.println("login function entered");
-        Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        //User valid_user = userService.getUserByUsername(user.username());
-        User valid_user = (User) auth.getPrincipal();
-        String token = jwtTokenUtil.generateAccessToken(valid_user);
+        System.out.println(username + " : " + password);
+        try {
 
-        return new OutgoingUserAndTokenDTO(new OutgoingUser(valid_user), token);
+            System.out.println("login function entered");
+            Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+
+            System.out.println("authenticated");
+            //User valid_user = userService.getUserByUsername(user.username());
+            User valid_user = (User) auth.getPrincipal();
+            System.out.println("principal obtained");
+            String token = jwtTokenUtil.generateAccessToken(valid_user);
+            System.out.println("token obtained");
+            return new OutgoingUserAndTokenDTO(new OutgoingUser(valid_user), token);
+        } catch (Exception ex){
+            throw new OtherException(ex.getMessage());
+        }
+
+
     }
 
 
 
     @PostMapping("login")
-    public ResponseEntity<OutgoingUserAndTokenDTO> login(@RequestBody IncomingLogin user){//, HttpSession session){
+    public ResponseEntity<OutgoingUserAndTokenDTO> login(@RequestBody IncomingLogin user){
         return ResponseEntity.ok(login_function(user.username(), user.password()));
     }
 
     @PostMapping("register")
-    public ResponseEntity<OutgoingUserAndTokenDTO> register(@RequestBody User user){//}, HttpSession session){
-        //HttpSession session = AuthAspect.getUserSession();
-
+    public ResponseEntity<OutgoingUserAndTokenDTO> register(@RequestBody User user){
+        String password = user.getPassword();
         OutgoingUser saved_user = userService.register(user);
 
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(login_function(user.getUsername(), user.getPassword()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(login_function(user.getUsername(), password));
     }
     // since we aren't tracking session and just tracking token, no longer a purpose for these functions
 

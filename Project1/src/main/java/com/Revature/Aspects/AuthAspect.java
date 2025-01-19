@@ -33,8 +33,8 @@ public class AuthAspect {
         return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().map(s->s.toString()).toList();
     }
 
-    public static String getSessionUsername(){
-        return (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public static User getSessionUser(){
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
 }

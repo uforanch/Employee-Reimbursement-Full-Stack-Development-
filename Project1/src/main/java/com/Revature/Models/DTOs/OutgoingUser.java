@@ -10,16 +10,18 @@ public class OutgoingUser {
     private String role;
     private String firstname;
     private String lastname;
+    private String shortId;
 
     public OutgoingUser() {
     }
 
-    public OutgoingUser(UUID userId, String username, String role, String firstname, String lastname) {
+    public OutgoingUser(UUID userId, String username, String role, String firstname, String lastname, String shortId) {
         this.userId = userId;
         this.username = username;
         this.role = role;
         this.firstname = firstname;
         this.lastname = lastname;
+        this.shortId = shortId;
     }
 
 
@@ -30,6 +32,7 @@ public class OutgoingUser {
         role = user.getRole();
         firstname = user.getFirstName();
         lastname = user.getLastName();
+        shortId = user.getShortId();
     }
 
     public UUID getUserId() {
@@ -70,6 +73,14 @@ public class OutgoingUser {
 
     public void setLastname(String lastname) {
         this.lastname = lastname;
+    }
+
+    public String getShortId() {
+        return shortId;
+    }
+
+    public void setShortId(String shortId) {
+        this.shortId = shortId;
     }
 
     @Override

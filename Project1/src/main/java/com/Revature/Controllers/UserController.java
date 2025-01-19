@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -31,48 +33,43 @@ public class UserController {
     @ManagerOnly
     @GetMapping()
     public ResponseEntity<List<OutgoingUser>> getAllUsers(){
-
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-
-
-
     @ManagerOnly
     @PatchMapping("{userId}/delete")
-    public  ResponseEntity<String>  deleteUser(@PathVariable UUID userId){
-        OutgoingUser valid_user = userService.retrieveUser(userId);
+    public  ResponseEntity<String>  deleteUser(@PathVariable String userId){
+        OutgoingUser valid_user = new OutgoingUser(userService.getUserByShortId(userId));
         userService.deleteUser(valid_user);
         return ResponseEntity.accepted().body("successfully deleted");
     }
 
     @PatchMapping()
-    public  ResponseEntity<OutgoingUser>   updateUser(@RequestBody User update){
+    public  ResponseEntity<OutgoingUser>  updateUser(@RequestBody User update){
         System.out.println(update);
-
-
         return ResponseEntity.accepted().body(userService.updateUser(update));
     }
 
 
     @GetMapping("/{userId}")
-    public ResponseEntity<User> getUserProfile(@PathVariable UUID userId){
-        return ResponseEntity.ok( userService.getUserProfile(userId));
+    public ResponseEntity<OutgoingUser> getUserProfile(@PathVariable String userId){
+        return ResponseEntity.ok( new OutgoingUser(userService.getUserByShortId(userId)));
     }
 
     @GetMapping("/{userId}/reimbursements")
-    public ResponseEntity<List<OutgoingReimbursement>> viewReimbursmentsForUser(@PathVariable UUID userId){
+    public ResponseEntity<List<OutgoingReimbursement>> viewReimbursmentsForUser(@PathVariable String userId){
         return ResponseEntity.ok().body(reimbursementService.getReimbursementsByUserId(userId));
     }
 
     @GetMapping("/{userId}/reimbursements/pending")
-    public ResponseEntity<List<OutgoingReimbursement>> viewReimbursmentsPending(@PathVariable UUID userId){
-        User valid_user = userService.getUserByUsername(AuthAspect.getSessionUsername());
-        if (!valid_user.getUserId().equals(userId) && !AuthAspect.getSessionUserRoles().contains("Manager")){
+    public ResponseEntity<List<OutgoingReimbursement>> viewReimbursmentsPending(@PathVariable String userId){
+        User valid_user = AuthAspect.getSessionUser();
+        if (!valid_user.getShortId().equals(userId) && !AuthAspect.getSessionUserRoles().contains("Manager")){
             throw new IllegalArgumentException("Unauthorized access to other user reimbursments.");
         }
+        User searchedUser = userService.getUserByShortId(userId);
 
-        return ResponseEntity.ok().body(reimbursementService.getReimburesmentsByStatus(new OutgoingUser(valid_user), "Pending"));
+        return ResponseEntity.ok().body(reimbursementService.getReimburesmentsByStatus(new OutgoingUser(searchedUser), "Pending"));
     }
 
 

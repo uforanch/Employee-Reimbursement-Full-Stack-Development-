@@ -34,7 +34,7 @@ public class ReimbursementService {
             throw new IllegalArgumentException("No such reimbursement");
         }
         Reimbursement valid_r = optional_valid_r.get();
-        User loggedUser = userDAO.findUserByUsername(AuthAspect.getSessionUsername());
+        User loggedUser = AuthAspect.getSessionUser();
         if (!valid_r.getUser().getUserId().equals(loggedUser.getUserId() ) && !AuthAspect.getSessionUserRoles().contains("Manager")){
             throw  new InvalidAccountException("Other user's reimbursmenet not viewable");
         }
@@ -59,7 +59,7 @@ public class ReimbursementService {
         if (!"Pending".equals(reimbursement.getStatus())&&(!AuthAspect.getSessionUserRoles().contains("Manager"))){
             throw new IllegalArgumentException("Unauthorized to create non pending reimbursment");
         }
-        User loggedUser = userDAO.findUserByUsername(AuthAspect.getSessionUsername());
+        User loggedUser = AuthAspect.getSessionUser();
         if ((!outgoingReimbursement.getUser().getUserId().equals(loggedUser.getUserId()))&&(!AuthAspect.getSessionUserRoles().contains("Manager"))){
             throw new IllegalArgumentException("Unauthorized to create reimbursment for others if not manager");
         }
@@ -75,13 +75,18 @@ public class ReimbursementService {
         return reimbursementDAO.findByStatus(status).stream().map((item)->{return new OutgoingReimbursement(item);}).toList();
     }
 
-    public List<OutgoingReimbursement> getReimbursementsByUserId(UUID userId){
-        User loggedUser = userDAO.findUserByUsername(AuthAspect.getSessionUsername());
-        if (!loggedUser.getUserId().equals(userId)&& !AuthAspect.getSessionUserRoles().contains("Manager")){
+    public List<OutgoingReimbursement> getReimbursementsByUserId(String userId){
+        User loggedUser = AuthAspect.getSessionUser();
+        Optional<User> optionalSearchedUser = userDAO.findUserByShortId(userId);
+        if (optionalSearchedUser.isEmpty()){
+            throw new IllegalArgumentException("No such user with this Id");
+        }
+        User searchedUser = optionalSearchedUser.get();
+        if (!loggedUser.getShortId().equals(userId)&& !AuthAspect.getSessionUserRoles().contains("Manager")){
             throw new IllegalArgumentException("Unauthorized access to other user reimbursments.");
         }
 
-        return reimbursementDAO.findByUserUserId(userId).stream().map((item)->{return new OutgoingReimbursement(item);}).toList();
+        return reimbursementDAO.findByUserUserId(searchedUser.getUserId()).stream().map((item)->{return new OutgoingReimbursement(item);}).toList();
     }
 
     public List<OutgoingReimbursement> getReimburesmentsByStatus(OutgoingUser user, String status){

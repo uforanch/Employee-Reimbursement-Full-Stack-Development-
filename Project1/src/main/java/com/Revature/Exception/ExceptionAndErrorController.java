@@ -12,7 +12,6 @@ public class ExceptionAndErrorController {
     @ResponseStatus(HttpStatus.CONFLICT)
     public @ResponseBody String duplicateUsername(DuplicateUsernameException ex){
         return ex.getMessage();
-
     }
 
     @ExceptionHandler(InvalidAccountException.class)
@@ -33,7 +32,10 @@ public class ExceptionAndErrorController {
         return ex.getMessage();
     }
 
-
-
+    @ExceptionHandler(OtherException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody String otherEx(OtherException ex){
+        return ex.getMessage();
+    }
 
 }

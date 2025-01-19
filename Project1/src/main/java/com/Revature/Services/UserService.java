@@ -8,21 +8,28 @@ import com.Revature.Exception.UnauthorizedLogin;
 import com.Revature.Models.DTOs.OutgoingUser;
 import com.Revature.Models.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService {
     private final UserDAO userDAO;
+    private final PasswordEncoder passwordEncoder;
+    private Random random = new Random();
 
     @Autowired
-    public UserService(UserDAO userDAO){
+    public UserService(UserDAO userDAO, PasswordEncoder passwordEncoder) {
         this.userDAO = userDAO;
+        this.passwordEncoder = passwordEncoder;
     }
+
+    public void setRandom(Random random){
+        this.random = random;
+    }
+
+
 
     private boolean validateNewUser(User user){
         if (user.getUsername().isBlank()) {
@@ -44,8 +51,28 @@ public class UserService {
 
         return true;
     }
+
+    private String generateUniqueShortId(){
+        String chars = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String out = "";
+        for(int i=0;i<10;i++){
+            out+=chars.charAt(random.nextInt(chars.length()));
+        }
+        return out;
+    }
+
+    private String getNewShortId(){
+        while(true){
+            String shortId = generateUniqueShortId();
+            Optional<User> otherUser = userDAO.findUserByShortId(shortId);
+            if (otherUser.isEmpty()){ return shortId; }
+        }
+    }
+
     public OutgoingUser register(User user){
         validateNewUser(user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setShortId(getNewShortId());
         User saved_user = userDAO.save(user);
         return new OutgoingUser(saved_user);
     }
@@ -71,6 +98,14 @@ public class UserService {
             throw new InvalidAccountException("No user exists for that username");
         }
         return valid_user;
+    }
+
+    public User getUserByShortId(String shortId){
+        Optional<User> optionalUser = userDAO.findUserByShortId(shortId);
+        if (optionalUser.isEmpty()){
+            throw new InvalidAccountException("No user exists for that Id");
+        }
+        return optionalUser.get();
     }
 
     public void deleteUser(OutgoingUser user){
@@ -112,8 +147,7 @@ public class UserService {
             throw new InvalidAccountException("No such user");
         }
         User user = optionalUser.get();
-        System.out.println(AuthAspect.getSessionUsername());
-        User loggedUser = userDAO.findUserByUsername(AuthAspect.getSessionUsername());
+        User loggedUser = AuthAspect.getSessionUser();
 
         if ((user.getUserId().equals(loggedUser.getUserId()) ) && (!AuthAspect.getSessionUserRoles().contains("Manager"))){
             throw new InvalidAccountException("Unauthorized profile view");
@@ -127,11 +161,11 @@ public class UserService {
         System.out.println("------------------------------");
 
         System.out.println(AuthAspect.getSessionUserRoles());
-        System.out.println(AuthAspect.getSessionUsername());
+        System.out.println(AuthAspect.getSessionUser());
         System.out.println(user.getUserId());
 
 
-        User loggedUser = userDAO.findUserByUsername(AuthAspect.getSessionUsername());
+        User loggedUser = AuthAspect.getSessionUser();
 
         if ((user.getUserId().equals(loggedUser.getUserId()) ) && (!AuthAspect.getSessionUserRoles().contains("Manager"))){
             throw new InvalidAccountException("Unauthorized profile view");

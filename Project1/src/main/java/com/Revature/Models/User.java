@@ -20,6 +20,9 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID userId;
 
+    @Column
+    private String shortId;
+
     @Column(nullable = false)
     private String username;
 
@@ -111,18 +114,27 @@ public class User implements UserDetails {
         this.reimbursementList = reimbursementList;
     }
 
+    public String getShortId() {
+        return shortId;
+    }
+
+    public void setShortId(String shortId) {
+        this.shortId = shortId;
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "userId=" + userId +
+                ", shortId='" + shortId + '\'' +
                 ", username='" + username + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", password='" + password + '\'' +
-                ", role='" + role +
+                ", role='" + role + '\'' +
+                ", reimbursementList=" + reimbursementList +
                 '}';
     }
-
 
     //~~~~~~~~~~~~~~~ UserDetails Overrides ~~~~~~~~~~~~~~~~
     @Override
@@ -149,4 +161,6 @@ public class User implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
     }
+
+
 }
