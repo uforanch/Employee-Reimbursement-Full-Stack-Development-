@@ -1,1 +1,87 @@
+@keyframes title_anim {
+  0% {letter-spacing: normal; color:blue; }
+  
+  50% {color:green}
+  
+  100% {color: red; letter-spacing: 5px; text-shadow: gold 0px 0px 30px;}
+  
+}
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+div {
+  padding: 1px
+}
+.Title {
+  color:blue;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  
+  animation: title_anim 1s;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
+  }
+
+.Form {
+  display: flex;
+  text-align: left;
+}
+
+.UserPageButton{
+  text-align: left;
+  border-style: hidden;
+  background: transparent;
+  text: blue;
+  padding: 0;
+  
+}
+
+.NavPanel{
+  text-align: left;
+}
+
+.RoleDisp{
+  text-align: left;
+}
+.Welcome {}
 .Quote {}
+.Edit{
+    border: lightblue;
+    background-color: aliceblue;
+      border-style: solid;
+      border-width: .1em;
+      border-radius: 5%;
+      padding: 5px;
+}
+.Highlight{}
+.UserBar{ display: flexbox;
+}
+.UserButton{text-align: right;
+padding: 0.3em .6em;}
+.UserInfo{text-align: left;}
+.NavPanel{
+  float: right;
+}
+.OK:hover{
+  border-color: greenyellow;
+  border-width: 2px;
+  text-shadow:green 0px 0px 2px;
+}
+.Cancel:hover{
+  border-color: red;
+  border-width: 2px;
+  text-shadow: red 0px 0px 2px;
+}
+
+.Disp{
+  font-weight: bold;
+      border: lightgrey;
+        background-color: aliceblue;
+        border-style: solid;
+        border-width: .1em;
+        border-radius: 5%;
+        padding: 5px;
+}

@@ -1,47 +1,43 @@
-package com.Revature.Models;
+package com.Revature.Models.DTOs;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import org.springframework.stereotype.Component;
+import com.Revature.Models.Reimbursement;
+import com.Revature.Models.User;
 
 import java.sql.Date;
 
-@Component
-@Entity
-@Table(name="reimbursements")
-public class Reimbursement {
-    public enum Status{
-        Pending,Denied, Approved
-    }
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class OutgoingReimbursement {
     private int reimbursementId;
 
     private float value;
 
     private String description;
 
-    @Column(nullable = false)
     private String status = "Pending";
 
-    @Column(nullable = false)
     private Date date_issued;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "userId")//name in the team CLASS
-    private User user;
+    private OutgoingUser user;
 
 
-    public Reimbursement() {
+    public OutgoingReimbursement() {
     }
 
-    public Reimbursement(int reimbursementId, float value, String description, String status, Date date_issued, User user) {
+    public OutgoingReimbursement(int reimbursementId, float value, String description, String status, Date date_issued, OutgoingUser user) {
         this.reimbursementId = reimbursementId;
         this.value = value;
         this.description = description;
         this.status = status;
         this.date_issued = date_issued;
         this.user = user;
+    }
+
+    public OutgoingReimbursement(Reimbursement reimbursement){
+        this.reimbursementId = reimbursement.getReimbursementId();
+        this.value = reimbursement.getValue();
+        this.description = reimbursement.getDescription();
+        this.status = reimbursement.getStatus();
+        this.date_issued = reimbursement.getDate_issued();
+        this.user = new OutgoingUser(reimbursement.getUser());
     }
 
     public int getReimbursementId() {
@@ -69,9 +65,6 @@ public class Reimbursement {
         this.description = description;
     }
 
-    public User getUser() {
-        return user;
-    }
 
     public String getStatus() {
         return status;
@@ -89,7 +82,11 @@ public class Reimbursement {
         this.date_issued = date_issued;
     }
 
-    public void setUser(User user) {
+    public OutgoingUser getUser() {
+        return user;
+    }
+
+    public void setUser(OutgoingUser user) {
         this.user = user;
     }
 

@@ -13,6 +13,22 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  background: url("./assets/bg.png") repeat;
+  animation: bg_anim 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes bg_anim {
+  from{
+    background-position: 0 0;
+  }
+  to {
+    background-position: 128px 128px;
+  }
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -25,7 +41,6 @@ a:hover {
 body {
   margin: 0;
   display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
@@ -37,8 +52,10 @@ h1 {
 
 button {
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 1px solid;
+  border-color: gold;
   padding: 0.6em 1.2em;
+  margin: .2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
@@ -46,8 +63,35 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
+select {
+  border-radius: 8px;
+  border: 1px solid;
+  border-color: gold;
+  padding: 0.6em 1.2em;
+  margin: .2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+input {
+  border-radius: 8px;
+  border: 1px solid;
+  border-color: gold;
+  padding: 0.6em 1.2em;
+  margin: .2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
 button:hover {
   border-color: #646cff;
+  text-shadow: gold 0px 0px 2px;
 }
 button:focus,
 button:focus-visible {
@@ -65,4 +109,38 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+table{
+  border: gold;
+  border-style: solid;
+  border-width: .1em;
+  border-radius: 5%;
+  padding: 5px;
+  background-color: aliceblue;
+}
+
+thead {
+  background-color: lightgoldenrodyellow;
+}
+td, th {
+  border: lightblue;
+  border-radius: 5%;
+  
+}
+th {
+  border-style: solid ;
+  border-width: .1px;
+  
+}
+td{
+  border-style: dashed;
+  border-width: .1px;
+}
+
+td:hover, th:hover{
+  border-style: solid;
+  color: blue;
+  text-shadow: blue 0px 0px 2px;
+  
 }
