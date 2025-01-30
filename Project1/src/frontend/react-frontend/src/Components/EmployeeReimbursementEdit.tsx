@@ -1,11 +1,12 @@
 
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom"
 
 import configData from "../config/config.json"
 import axios from "axios";
 import { reimbursementUnMap, reimbusementMap, ReimbursementProps} from "./Common/Utils";
+import { AuthContext } from "./Common/Authorization";
 
 /*
 useeffect get the current reimburesment
@@ -13,12 +14,12 @@ if you can't, error and redirect
 */ 
 
 function EmployeeReimbursementEdit() {
-
-    
+    const token = useContext(AuthContext).token;
     const nav = useNavigate()
     const id = useParams().id;
     const [getDesc, setDesc] = useState<string>("")
     const [getR, setR] = useState<ReimbursementProps>({id:0, value:0, description:"", status:"", date_issued:new Date(), username:""});
+    
     console.log(id);
 
     
@@ -27,7 +28,9 @@ function EmployeeReimbursementEdit() {
 
 
         console.log(urlString)
-        const config = {withCredentials:false}
+        const config = {headers: {
+                'Authorization':`Bearer ${token}`
+            }}
         await axios.get(urlString +"/reimbursements/"+id, config).then(
             (response)=>{console.log(response);
                 const r:ReimbursementProps = reimbusementMap(response.data)

@@ -15,7 +15,7 @@ use effect populate from userid
 
 */
 
-interface fullUserSend{userId:number, username:string, password:string, firstName:string, lastName:string, role:string}
+interface fullUserSend{userId:string, username:string, password:string, firstName:string, lastName:string, role:string}
 
 function UserManagementPage():ReactNode{
     const [getUsername, setUsername] = useState<string>("")
@@ -24,10 +24,12 @@ function UserManagementPage():ReactNode{
     const [getFirstName, setFirstName] = useState<string>("")
     const [getLastName, setLasttName] = useState<string>("")
     const [getRole, setRole] = useState<string>("")
+    const [getTrueUserId, setTrueUserId]=useState<string>("")
+    const id = useParams().id
+    const userid = useContext(AuthContext).userId
     
-    const id = Number(useParams().id)
-    const userid = Number(useContext(AuthContext).userId)
     const role = useContext(AuthContext).role;
+    const token = useContext(AuthContext).token;
     const nav = useNavigate()
     console.log(id, userid)
 
@@ -38,7 +40,9 @@ function UserManagementPage():ReactNode{
 
 
         console.log(urlString)
-        const config = {withCredentials:false}
+        const config = {headers: {
+                'Authorization':`Bearer ${token}`
+            }}
         await axios.get(urlString +"/users/"+id, config).then(
             (response)=>{console.log(response);
                 setUsername(response.data.username);
@@ -47,6 +51,7 @@ function UserManagementPage():ReactNode{
                 setPassword1(response.data.password);
                 setPassword2("");
                 setRole(response.data.role);
+                setTrueUserId(response.data.userId)
             }
 
             
@@ -63,8 +68,10 @@ function UserManagementPage():ReactNode{
 
 
         
-        const config = {withCredentials:false}
-        const userSend:fullUserSend = {userId:userid, username:getUsername, password:getPassword1, firstName:getFirstName, lastName:getLastName, role:role}
+        const config = {headers: {
+                'Authorization':`Bearer ${token}`
+            }}
+        const userSend:fullUserSend = {userId:getTrueUserId, username:getUsername, password:getPassword1, firstName:getFirstName, lastName:getLastName, role:role}
         
         console.log(userSend)
         await axios.patch(urlString + "/users" , userSend, config).then(

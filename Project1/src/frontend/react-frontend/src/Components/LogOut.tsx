@@ -13,30 +13,17 @@ effect log out
 
 function LogOut({authSetter, flagSetter}:AuthSetterType){
 
-    const LogOutFunc = ()=>{const axiossubmit00= async () =>{
+    const LogOutFunc = ()=>{
         
             console.log("Logout GO")
-            const config = { withCredentials:true}
-            await axios.post(configData.SERVER_URL+"/auth/logout", config)
-            .then(
-                response=>{
-                    console.log(response)
-                    const authProp:AuthorizationProps = {username:"",
-                        userId:0,
-                        role:""
-                    }
-                    authSetter(authProp)
-                    flagSetter(Date.now())
-                    
-                }
-                )
-            .catch((error:AxiosError)=>{
-                console.log("error"); 
-                console.log(error); 
-        })}
-        axiossubmit00();
+            const authProp:AuthorizationProps = DefaultAuth
+            authSetter(authProp)
+            flagSetter(Date.now())
+            localStorage.removeItem("loggedInUser")
         
-    }
+        }
+        
+    
     
     const nav = useNavigate();
     useEffect(()=>{

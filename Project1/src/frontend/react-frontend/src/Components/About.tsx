@@ -11,7 +11,7 @@ function About():ReactNode {
     const auth = useContext(AuthContext)
 
     
-    if (auth.userId==0){
+    if (auth.token===""){
     return <>
     <button onClick={toLogin} >Login</button><button onClick={toRegister}>Register</button>
     <h3 className="Welcome">Welcome to Rimbsr</h3>

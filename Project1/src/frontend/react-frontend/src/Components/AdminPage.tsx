@@ -7,10 +7,16 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom"
 import configData from "../config/config.json"
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserReturn } from "./Common/Utils";
+import { AuthContext } from "./Common/Authorization";
 
 function AdminPage() {
+        const token = useContext(AuthContext).token;
+                const config = {headers: {
+                    'Authorization':`Bearer ${token}`
+                }}
+        
     const nav = useNavigate()
 
     const [getUsers, setUsers] = useState<UserReturn[]>([])
@@ -19,7 +25,6 @@ function AdminPage() {
         let urlString = configData.SERVER_URL;
 
         console.log(urlString)
-        const config = {withCredentials:false}
         await axios.get(urlString +"/users", config).then(
             (response)=>{console.log(response.data)
             setUsers(response.data as UserReturn[])

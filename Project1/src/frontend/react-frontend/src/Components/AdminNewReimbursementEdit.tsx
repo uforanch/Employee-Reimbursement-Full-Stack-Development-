@@ -25,12 +25,15 @@ function AdminNewReimbursementEdit() {
     
     
     const urlString = configData.SERVER_URL ;
+        const token = useContext(AuthContext).token;
+            const config = {headers: {
+                'Authorization':`Bearer ${token}`
+            }}
     
     const loadAllUsers = async ()=>{
         let urlString = configData.SERVER_URL;
 
         console.log(urlString)
-        const config = {withCredentials:false}
         await axios.get(urlString +"/users", config).then(
             (response)=>{console.log(response.data)
             setUsers(response.data as UserReturn[])
@@ -40,7 +43,6 @@ function AdminNewReimbursementEdit() {
 
         ).catch(
             (error)=>{console.log(error)}
-
         )
 
     }
@@ -52,9 +54,8 @@ function AdminNewReimbursementEdit() {
 
 
         console.log(urlString)
-        const config = {withCredentials:false}
         const r:ReimbursementProps = {...getR, description:getDesc as string, status:getStatus}
-        const r_send:ReimburementReturn ={...reimbursementUnMap(r), user:{userId:getUsersFilter, username:"", role:""}}
+        const r_send:ReimburementReturn ={...reimbursementUnMap(r), user:getUsers[getUsersFilter]}
         console.log(r_send)
         await axios.post(urlString +"/reimbursements", r_send,config).then(
             (response)=>{console.log(response);

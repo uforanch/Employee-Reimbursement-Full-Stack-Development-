@@ -39,27 +39,16 @@ function App() {
 
   
     const GetAuthFunc = () =>{
-        const axiosSubmit00 =async () => {
-            console.log("GetAuthFunction GO")
-            const config = {timeout:5000, withCredentials:true}
-            await axios.get(configData.SERVER_URL+"/auth", config)
-            .then(
-                response=>{
-                  
-                    console.log(response)
-                    const authProp:AuthorizationProps = {username:response.data.username,
-                        userId:response.data.userId,
-                        role:response.data.role
-                    }
-                    authSetter(authProp)
-                    
-                }
-                )
-            .catch((error:AxiosError)=>{
-                console.log("error"); 
-                console.log(error); 
-        })}
-        axiosSubmit00()
+      if (getAuth.token===""){
+        const storedUserJson = localStorage.getItem("loggedInUser");
+        const storedUser = storedUserJson ? JSON.parse(storedUserJson) : null;
+        if (storedUser===null){ 
+          setAuth(DefaultAuth);
+        } else {
+          setAuth(storedUser);
+        }
+      }
+      
         
     }
     useEffect(GetAuthFunc, [authChangeFlag])
@@ -67,7 +56,7 @@ function App() {
     
   console.log(getAuth)
 
-  if (getAuth.userId!=0 && getAuth.role==="Manager"){
+  if (getAuth.token.length !=0 && getAuth.role==="Manager"){
 return (<>
     <div>
     <h1 className='Title'>Rimbsr</h1>
@@ -93,7 +82,7 @@ return (<>
     </>
   )
     
-  } else if (getAuth.userId!=0) {
+  } else if (getAuth.token.length != 0) {
 return (<>
     <div>
     <h1 className='Title'>Rimbsr</h1>
@@ -119,7 +108,6 @@ return (<>
     </>
   )
 }
-   
   return (<>
     <div>
     <h1 className='Title'>Rimbsr</h1>

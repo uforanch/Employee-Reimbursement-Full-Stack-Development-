@@ -10,6 +10,10 @@ import { AuthContext } from "./Common/Authorization";
 import { ReimburementReturn, reimbursementUnMap } from "./Common/Utils";
 
 function EmployeeNewReimbursementEdit() {
+    const token = useContext(AuthContext).token;
+            const config = {headers: {
+                'Authorization':`Bearer ${token}`
+            }}
     
     const nav = useNavigate();
     const id  = useContext(AuthContext).userId;
@@ -21,15 +25,17 @@ function EmployeeNewReimbursementEdit() {
     const [getValue, setValue] = useState("")//for all are strings and will be changed
 
     
-    
     const axiosSubmit01=async ()=>{
         const urlString = configData.SERVER_URL ;
 
 
         console.log(urlString)
-        const config = {withCredentials:false}
+
         const r:ReimbursementProps = {date_issued: new Date(getDate), description:getDesc as string, status:"Pending", value:parseFloat(getValue), username:"", id:0};    
-        const r_send:ReimburementReturn ={...reimbursementUnMap(r), user:{username:username, userId:id, role:role}}
+        let userId = "";
+        await axios.get(urlString + "/users/" + id, config).then((response)=>{userId=response.data.userId})
+        const r_send:ReimburementReturn ={...reimbursementUnMap(r), user:{username:username, shortId:id, role:role, userId:userId}}
+
         await axios.post(urlString +"/reimbursements", r_send,config).then(
             (response)=>{console.log(response);
             //setDesc(r.description);

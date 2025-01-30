@@ -26,10 +26,13 @@ function Login({authSetter, flagSetter}:AuthSetterType):ReactNode{
                 response=>{
                     setErrorText("");
                     console.log(response)
-                    const authProp:AuthorizationProps = {username:response.data.username,
-                        userId:response.data.userId,
-                        role:response.data.role
+                    const authProp:AuthorizationProps = {username:response.data.user.username,
+                        userId:response.data.user.shortId,
+                        role:response.data.user.role,
+                        token: response.data.token
+
                     }
+                    localStorage.setItem("loggedInUser", JSON.stringify(authProp))
                     authSetter(authProp)
                     flagSetter(Date.now())
                     nav("/user")

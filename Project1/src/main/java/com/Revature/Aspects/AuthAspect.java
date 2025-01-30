@@ -13,6 +13,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.List;
+import java.util.UUID;
 
 @Aspect
 @Component
@@ -33,8 +34,8 @@ public class AuthAspect {
         return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().map(s->s.toString()).toList();
     }
 
-    public static User getSessionUser(){
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public static UUID getSessionUser(){
+        return ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
     }
 
 }

@@ -29,8 +29,6 @@ public class UserService {
         this.random = random;
     }
 
-
-
     private boolean validateNewUser(User user){
         if (user.getUsername().isBlank()) {
             throw new InvalidAccountException("Username cannot be blank");
@@ -147,7 +145,7 @@ public class UserService {
             throw new InvalidAccountException("No such user");
         }
         User user = optionalUser.get();
-        User loggedUser = AuthAspect.getSessionUser();
+        OutgoingUser loggedUser = retrieveUser( AuthAspect.getSessionUser());
 
         if ((user.getUserId().equals(loggedUser.getUserId()) ) && (!AuthAspect.getSessionUserRoles().contains("Manager"))){
             throw new InvalidAccountException("Unauthorized profile view");
@@ -165,7 +163,7 @@ public class UserService {
         System.out.println(user.getUserId());
 
 
-        User loggedUser = AuthAspect.getSessionUser();
+        OutgoingUser loggedUser = retrieveUser( AuthAspect.getSessionUser());
 
         if ((user.getUserId().equals(loggedUser.getUserId()) ) && (!AuthAspect.getSessionUserRoles().contains("Manager"))){
             throw new InvalidAccountException("Unauthorized profile view");

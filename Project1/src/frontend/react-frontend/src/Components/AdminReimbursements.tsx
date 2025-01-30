@@ -39,26 +39,29 @@ function AdminReimbursementItem({id,value,description,status,date_issued, userna
 }
 
 
-const topOption ={userId:0,username:"Any User"}
+const topOption ={userId:"",username:"Any User"}
 
 function AdminReimbursements(){
     const auth = useContext(AuthContext); 
+    const token = useContext(AuthContext).token;
     const nav = useNavigate()
     const [getUsers, setUsers] = useState<UserReturn[]>([])
     const r: ReimbursementProps[]=[{id:1, value:2.0, description:"x", status:"Pending", date_issued:new Date(), username:"USER 1"},
     {id:2, value:2.0, description:"y", status:"Pending", date_issued:new Date(), username:"USER 2"}
 ]
     const [getStatus, setStatus] = useState("any");
-    const [getUserFilter, setUserFilter] = useState(0);
+    const [getUserFilter, setUserFilter] = useState("");
     const [getR, setR] =useState(r);
 
+        const config = {headers: {
+                'Authorization':`Bearer ${token}`
+            }}
     
 
     const loadAllUsers = async ()=>{
         let urlString = configData.SERVER_URL;
 
         console.log(urlString)
-        const config = {withCredentials:false}
         await axios.get(urlString +"/users", config).then(
             (response)=>{console.log(response.data)
             response.data.unshift(topOption)
@@ -79,7 +82,7 @@ function AdminReimbursements(){
     const axiosSubmit00=async ()=>{
         let urlString = configData.SERVER_URL;
 
-        if (getUserFilter!=0){
+        if (getUserFilter.length!=0){
             switch (getStatus) {
                 case "any": { urlString+="/users/"+getUserFilter+"/reimbursements"; break;}
                 case "pending": { urlString+="/users/"+getUserFilter+"/reimbursements/pending"; break;}
@@ -93,7 +96,6 @@ function AdminReimbursements(){
             }
         }
         console.log(urlString)
-        const config = {withCredentials:false}
         await axios.get(urlString, config).then(
             (response)=>{console.log(response)
                 setR(response.data.map(reimbusementMap))
@@ -121,8 +123,8 @@ function AdminReimbursements(){
             <option value={"pending"}>{"Pending"}</option>
         </select>
         {/*todo populate with a second useeffect to get users */}
-        <select value={getUserFilter} onChange={event=>{setUserFilter(Number.parseInt( event.target.value) )}}>
-            {getUsers.map((item:UserReturn)=><option value={item.userId}>{item.username}</option>)}
+        <select value={getUserFilter} onChange={event=>{setUserFilter(event.target.value )}}>
+            {getUsers.map((item:UserReturn)=><option value={item.shortId}>{item.username}</option>)}
         </select>
         
         <button onClick={()=>{nav("/user/reimbursements/new")}}>

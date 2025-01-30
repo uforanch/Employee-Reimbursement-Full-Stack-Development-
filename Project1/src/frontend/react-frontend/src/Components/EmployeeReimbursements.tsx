@@ -45,6 +45,7 @@ pull reimburesments into menu
 function EmployeeReimbursements(){
     const nav = useNavigate();
     const auth = useContext(AuthContext);
+    const token = useContext(AuthContext).token;
     
         const r: ReimbursementProps[]=[{id:1, value:2.0, description:"x", status:"Pending", date_issued:new Date(), username:"USER 1"},
     {id:2, value:2.0, description:"y", status:"Pending", date_issued:new Date(), username:"USER 2"}
@@ -64,7 +65,9 @@ function EmployeeReimbursements(){
             default: urlString+="/users/"+auth.userId+"/reimbursements"; /*TODO change later for more statuses*/
         }
         console.log(urlString)
-        const config = {withCredentials:false}
+        const config = {headers: {
+                'Authorization':`Bearer ${token}`
+            }}
         await axios.get(urlString, config).then(
             (response)=>{console.log(response)
                 setR(response.data.map(reimbusementMap))

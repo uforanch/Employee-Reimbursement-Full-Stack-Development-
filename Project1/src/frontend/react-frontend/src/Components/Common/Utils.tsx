@@ -8,12 +8,12 @@ types will be in here too, because
 
 //import configData from "../../config/config.json"
 export interface UserReturn{
-    userId: number;
+    userId: string;
     username: string;
     role: string;
     firstname?: string;
-    lastname?: string;
-    
+    lastname?: string; 
+    shortId: string;
 }
 
 export interface ReimburementReturn {

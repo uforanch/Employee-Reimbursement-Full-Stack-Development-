@@ -13,10 +13,13 @@ interface DisabledAdvice{
 use effect populate from  user id
 
 */
-interface fullUserSend{userId:number, username:string, password:string, firstName:string, lastName:string, role:string}
+interface fullUserSend{userId:string, shortId:string, username:string, password:string, firstName:string, lastName:string, role:string}
 
 
 function AdminUserManagementPage():ReactNode{
+    const token = useContext(AuthContext).token;
+    const [getUserId, setUserId] = useState<string>("")
+    const [getShortId, setShortId] = useState<string>("")
     const [getUsername, setUsername] = useState<string>("")
     const [getPassword1, setPassword1] = useState<string>("")
     const [getPassword2, setPassword2] = useState<string>("")
@@ -24,7 +27,11 @@ function AdminUserManagementPage():ReactNode{
     const [geLasttName, setLasttName] = useState<string>("")
     const [getRole, setRole] = useState<string>("Employee")
     const nav = useNavigate()
-    
+     
+    const config = {headers: {
+            'Authorization':`Bearer ${token}`
+        }}
+
     const id = Number(useParams().id)
     
     const btnDisable = ():DisabledAdvice =>{
@@ -57,9 +64,11 @@ function AdminUserManagementPage():ReactNode{
 
 
         console.log(urlString)
-        const config = {withCredentials:false}
+
         await axios.get(urlString +"/users/"+id, config).then(
             (response)=>{console.log(response);
+                setUserId(response.data.userId);
+                setShortId(response.data.shortId);
                 setUsername(response.data.username);
                 setFirstName(response.data.firstName === null? "" : response.data.firstName );
                 setLasttName(response.data.lastName=== null? "" : response.data.lastName );
@@ -81,9 +90,8 @@ function AdminUserManagementPage():ReactNode{
         const urlString = configData.SERVER_URL ;
 
 
-        
-        const config = {withCredentials:false}
-        const userSend:fullUserSend = {userId:id, username:getUsername, password:getPassword1, firstName:getFirstName, lastName:geLasttName, role:getRole}
+       
+        const userSend:fullUserSend = {userId:getUserId, shortId:getShortId, username:getUsername, password:getPassword1, firstName:getFirstName, lastName:geLasttName, role:getRole}
         
         console.log(userSend)
         await axios.patch(urlString + "/users" , userSend, config).then(
@@ -104,10 +112,6 @@ function AdminUserManagementPage():ReactNode{
     
     const axiosSubmit02=async ()=>{
         const urlString = configData.SERVER_URL ;
-
-
-        
-        const config = {withCredentials:false}
         
         await axios.patch(urlString + "/users/" + id+"/delete" , null, config).then(
             (response)=>{console.log(response);

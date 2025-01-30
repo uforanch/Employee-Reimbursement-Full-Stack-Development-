@@ -48,8 +48,9 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(UUID userId, String username, String firstName, String lastName, String password, String role, List<Reimbursement> reimbursementList) {
+    public User(UUID userId, String shortId, String username, String firstName, String lastName, String password, String role, List<Reimbursement> reimbursementList) {
         this.userId = userId;
+        this.shortId = shortId;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -131,8 +132,7 @@ public class User implements UserDetails {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", password='" + password + '\'' +
-                ", role='" + role + '\'' +
-                ", reimbursementList=" + reimbursementList +
+                ", role='" + role + '\''+
                 '}';
     }
 

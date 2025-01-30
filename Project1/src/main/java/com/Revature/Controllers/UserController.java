@@ -58,12 +58,14 @@ public class UserController {
 
     @GetMapping("/{userId}/reimbursements")
     public ResponseEntity<List<OutgoingReimbursement>> viewReimbursmentsForUser(@PathVariable String userId){
+        //userId here IS shortId
+        //didn't change all instances of userId to shortId in language - pressed for time atm
         return ResponseEntity.ok().body(reimbursementService.getReimbursementsByUserId(userId));
     }
 
     @GetMapping("/{userId}/reimbursements/pending")
     public ResponseEntity<List<OutgoingReimbursement>> viewReimbursmentsPending(@PathVariable String userId){
-        User valid_user = AuthAspect.getSessionUser();
+        OutgoingUser valid_user = userService.retrieveUser( AuthAspect.getSessionUser());
         if (!valid_user.getShortId().equals(userId) && !AuthAspect.getSessionUserRoles().contains("Manager")){
             throw new IllegalArgumentException("Unauthorized access to other user reimbursments.");
         }
