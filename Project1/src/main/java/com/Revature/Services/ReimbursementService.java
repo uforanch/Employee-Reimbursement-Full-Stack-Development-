@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
+@Service
 public class ReimbursementService {
     UserDAO userDAO;
     ReimbursementDAO reimbursementDAO;
